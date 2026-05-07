@@ -1,6 +1,8 @@
 const https = require('https')
 
 
+
+
 const CITIES = {
   'new-york-new-jersey': { name: 'New York / New Jersey', airport: 'EWR', neighborhood: 'Midtown Manhattan or Jersey City' },
   'los-angeles': { name: 'Los Angeles', airport: 'LAX', neighborhood: 'Downtown LA or Santa Monica' },
@@ -21,6 +23,8 @@ const CITIES = {
 }
 
 
+
+
 const GROUP_MATCHES = {
   'brazil': ['June 13 18:00 ET - Brazil vs Morocco - MetLife Stadium, New York/NJ','June 19 21:00 ET - Brazil vs Haiti - Lincoln Financial Field, Philadelphia','June 24 18:00 ET - Scotland vs Brazil - Hard Rock Stadium, Miami'],
   'england': ['June 17 16:00 ET - England vs Croatia - ATT Stadium, Dallas','June 23 16:00 ET - England vs Ghana - Gillette Stadium, Boston','June 27 17:00 ET - Panama vs England - MetLife Stadium, New York/NJ'],
@@ -34,5 +38,3 @@ const GROUP_MATCHES = {
   'netherlands': ['June 14 16:00 ET - Netherlands vs Japan - ATT Stadium, Dallas','June 20 13:00 ET - Netherlands vs Sweden - NRG Stadium, Houston','June 25 19:00 ET - Tunisia vs Netherlands - Arrowhead Stadium, Kansas City'],
   'canada': ['June 12 15:00 ET - Canada vs Bosnia - BMO Field, Toronto','June 18 18:00 ET - Canada vs Qatar - BC Place, Vancouver','June 24 15:00 ET - Switzerland vs Canada - BC Place, Vancouver'],
   'morocco': ['June 13 18:00 ET - Brazil vs Morocco - MetLife Stadium, New York/NJ','June 19 18:00 ET - Morocco vs Scotland - Gillette Stadium, Boston','June 24 18:00 ET - Morocco vs Haiti - Mercedes-Benz Stadium, Atlanta'],
-}
-
