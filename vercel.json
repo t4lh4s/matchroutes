@@ -2,10 +2,14 @@
   "version": 2,
   "builds": [
     { "src": "api/generate.js", "use": "@vercel/node" },
+    { "src": "api/save-plan.js", "use": "@vercel/node" },
+    { "src": "api/load-plan.js", "use": "@vercel/node" },
     { "src": "index.html", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/api/generate", "dest": "/api/generate.js" },
+    { "src": "/api/save-plan", "dest": "/api/save-plan.js" },
+    { "src": "/api/load-plan", "dest": "/api/load-plan.js" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }

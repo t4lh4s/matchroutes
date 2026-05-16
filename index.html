@@ -223,6 +223,15 @@
   .divider { position:relative; z-index:1; height:1px; background:var(--border); }
   .hidden { display:none !important; }
 
+  /* SHARE PANEL */
+  .share-panel { background:rgba(106,179,42,0.08); border:1px solid rgba(106,179,42,0.3); border-radius:12px; padding:16px; margin-bottom:1rem; }
+  .share-panel-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--green-light); margin-bottom:10px; }
+  .share-url-row { display:flex; gap:8px; }
+  .share-url-input { flex:1; min-width:0; background:var(--dark); border:1px solid var(--border); border-radius:6px; padding:8px 12px; color:var(--text-muted); font-family:'Barlow',sans-serif; font-size:12px; outline:none; }
+  .shared-banner { background:var(--dark-3); border:1px solid var(--border-bright); border-radius:12px; padding:14px 16px; margin-bottom:1rem; display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+  .shared-banner p { font-size:13px; color:var(--text-muted); line-height:1.5; }
+  .shared-banner strong { color:var(--text); }
+
   /* AUTOCOMPLETE */
   .ac-wrap { position:relative; }
   .ac-list { display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--dark-3); border:1px solid var(--border-bright); border-radius:8px; z-index:200; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.5); }
@@ -428,6 +437,17 @@
     <!-- RESULT STATE -->
     <div id="result-state" class="hidden">
       <button class="back-btn" onclick="showForm()">← Plan a new trip</button>
+      <div id="sharePanel" class="share-panel hidden">
+        <div class="share-panel-title">✅ Trip saved — share with your crew</div>
+        <div class="share-url-row">
+          <input id="sharePlanUrl" class="share-url-input" readonly>
+          <button class="btn-primary" id="copyLinkBtn" style="padding:8px 16px;font-size:13px;white-space:nowrap" onclick="copyShareLink()">Copy link</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <a id="whatsappBtn" href="#" target="_blank" rel="noopener" class="link-btn link-other" style="font-size:12px">💬 WhatsApp</a>
+          <a id="twitterBtn" href="#" target="_blank" rel="noopener" class="link-btn link-other" style="font-size:12px">Share on X</a>
+        </div>
+      </div>
       <div id="itinContent"></div>
     </div>
 
@@ -524,6 +544,7 @@ function showLanding() {
 
 function showForm() {
   document.getElementById('result-state').classList.add('hidden')
+  document.getElementById('sharePanel').classList.add('hidden')
   document.getElementById('form-state').classList.remove('hidden')
   window.scrollTo(0,0)
 }
@@ -566,6 +587,7 @@ async function generate() {
     const itin = await res.json()
     clearInterval(interval)
     renderItinerary(itin)
+    savePlan(itin)
   } catch(e) {
     clearInterval(interval)
     alert('Something went wrong. Please try again.')
@@ -584,7 +606,7 @@ const BADGE_CLASS = {
   'Quarterfinal':'badge-qf','Semifinal':'badge-sf','Final':'badge-sf'
 }
 
-function renderItinerary(itin) {
+function renderItinerary(itin, opts={}) {
   document.getElementById('loading-state').classList.add('hidden')
   document.getElementById('result-state').classList.remove('hidden')
   window.scrollTo(0,0)
@@ -592,7 +614,13 @@ function renderItinerary(itin) {
   const totalNights = (itin.cities||[]).reduce((a,c)=>a+(c.nights||0),0)
   const twitterText = encodeURIComponent(`Just planned my ${selectedTeam.name} World Cup 2026 trip with MatchRoutes — AI builds your full itinerary around your team's matches! matchroutes.com #WorldCup2026 #${selectedTeam.name.replace(/\s/g,'')}`)
 
-  let html = `
+  let html = opts.shared ? `
+    <div class="shared-banner">
+      <p>Viewing <strong>${selectedTeam.flag} ${selectedTeam.name}</strong> World Cup trip plan shared by a fellow fan</p>
+      <button class="btn-primary" style="padding:8px 18px;font-size:13px;white-space:nowrap" onclick="showLanding();scrollToTool()">Plan my own trip →</button>
+    </div>` : ''
+
+  html += `
     <div class="itin-header">
       <div class="itin-team">${selectedTeam.flag} ${selectedTeam.name} <span>World Cup 2026</span></div>
       <p class="itin-summary">${itin.summary||''}</p>
@@ -774,6 +802,67 @@ function acNav(e,lid){
 }
 
 document.addEventListener('click',e=>{if(!e.target.closest('.ac-wrap'))document.querySelectorAll('.ac-list').forEach(l=>l.style.display='none')})
+
+async function savePlan(itin) {
+  try {
+    const res = await fetch('/api/save-plan', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        teamSlug: selectedTeam.slug,
+        teamName: selectedTeam.name,
+        teamFlag: selectedTeam.flag,
+        homeCity: selectedOrigin.city || document.getElementById('homeCity').value,
+        itinerary: itin
+      })
+    })
+    const { shareToken } = await res.json()
+    if (shareToken) showSharePanel(shareToken)
+  } catch(e) {}
+}
+
+function showSharePanel(token) {
+  const url = window.location.origin + '?plan=' + token
+  document.getElementById('sharePlanUrl').value = url
+  const msg = encodeURIComponent('Check out my ' + selectedTeam.name + ' World Cup 2026 trip plan 🌍⚽ ' + url)
+  document.getElementById('whatsappBtn').href = 'https://wa.me/?text=' + msg
+  document.getElementById('twitterBtn').href = 'https://twitter.com/intent/tweet?text=' + msg
+  document.getElementById('sharePanel').classList.remove('hidden')
+}
+
+function copyShareLink() {
+  navigator.clipboard.writeText(document.getElementById('sharePlanUrl').value)
+  const btn = document.getElementById('copyLinkBtn')
+  btn.textContent = 'Copied!'
+  setTimeout(() => btn.textContent = 'Copy link', 2000)
+}
+
+async function loadSharedPlan(token) {
+  document.getElementById('landing-view').classList.add('hidden')
+  document.getElementById('tool-view').classList.remove('hidden')
+  document.getElementById('form-state').classList.add('hidden')
+  document.getElementById('loading-state').classList.remove('hidden')
+  document.getElementById('loadingMsg').textContent = 'Loading shared trip plan...'
+  window.scrollTo(0,0)
+  try {
+    const res = await fetch('/api/load-plan?token=' + encodeURIComponent(token))
+    if (!res.ok) throw new Error('not found')
+    const plan = await res.json()
+    selectedTeam = { slug: plan.team_slug, name: plan.team_name, flag: plan.team_flag }
+    renderItinerary(plan.itinerary, { shared: true })
+  } catch(e) {
+    document.getElementById('loading-state').classList.add('hidden')
+    document.getElementById('landing-view').classList.remove('hidden')
+    document.getElementById('tool-view').classList.add('hidden')
+  }
+}
+
+// Load shared plan if ?plan= in URL
+;(async function(){
+  const token = new URLSearchParams(window.location.search).get('plan')
+  if (token) await loadSharedPlan(token)
+})()
+
 // Init
 buildGroupFilter()
 renderTeams()
