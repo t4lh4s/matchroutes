@@ -672,29 +672,82 @@ function renderItinerary(itin) {
 }
 
 
-const AIRPORTS=[{i:'LHR',c:'London Heathrow',n:'UK'},{i:'LGW',c:'London Gatwick',n:'UK'},{i:'STN',c:'London Stansted',n:'UK'},{i:'JFK',c:'New York JFK',n:'USA'},{i:'EWR',c:'Newark',n:'USA'},{i:'LAX',c:'Los Angeles',n:'USA'},{i:'ORD',c:'Chicago',n:'USA'},{i:'ATL',c:'Atlanta',n:'USA'},{i:'DFW',c:'Dallas',n:'USA'},{i:'MIA',c:'Miami',n:'USA'},{i:'SFO',c:'San Francisco',n:'USA'},{i:'BOS',c:'Boston',n:'USA'},{i:'SEA',c:'Seattle',n:'USA'},{i:'IAH',c:'Houston Bush',n:'USA'},{i:'PHL',c:'Philadelphia',n:'USA'},{i:'MCI',c:'Kansas City',n:'USA'},{i:'YYZ',c:'Toronto',n:'Canada'},{i:'YVR',c:'Vancouver',n:'Canada'},{i:'MEX',c:'Mexico City',n:'Mexico'},{i:'GDL',c:'Guadalajara',n:'Mexico'},{i:'MTY',c:'Monterrey',n:'Mexico'},{i:'GRU',c:'Sao Paulo',n:'Brazil'},{i:'GIG',c:'Rio de Janeiro',n:'Brazil'},{i:'EZE',c:'Buenos Aires',n:'Argentina'},{i:'BOG',c:'Bogota',n:'Colombia'},{i:'SCL',c:'Santiago',n:'Chile'},{i:'CDG',c:'Paris CDG',n:'France'},{i:'AMS',c:'Amsterdam',n:'Netherlands'},{i:'FRA',c:'Frankfurt',n:'Germany'},{i:'MUC',c:'Munich',n:'Germany'},{i:'BER',c:'Berlin',n:'Germany'},{i:'MAD',c:'Madrid',n:'Spain'},{i:'BCN',c:'Barcelona',n:'Spain'},{i:'FCO',c:'Rome',n:'Italy'},{i:'ZRH',c:'Zurich',n:'Switzerland'},{i:'LIS',c:'Lisbon',n:'Portugal'},{i:'DUB',c:'Dublin',n:'Ireland'},{i:'CPH',c:'Copenhagen',n:'Denmark'},{i:'OSL',c:'Oslo',n:'Norway'},{i:'ARN',c:'Stockholm',n:'Sweden'},{i:'IST',c:'Istanbul',n:'Turkey'},{i:'DXB',c:'Dubai',n:'UAE'},{i:'DOH',c:'Doha',n:'Qatar'},{i:'CAI',c:'Cairo',n:'Egypt'},{i:'CMN',c:'Casablanca',n:'Morocco'},{i:'JNB',c:'Johannesburg',n:'South Africa'},{i:'CPT',c:'Cape Town',n:'South Africa'},{i:'NBO',c:'Nairobi',n:'Kenya'},{i:'ACC',c:'Accra',n:'Ghana'},{i:'NRT',c:'Tokyo Narita',n:'Japan'},{i:'HND',c:'Tokyo Haneda',n:'Japan'},{i:'ICN',c:'Seoul',n:'South Korea'},{i:'PVG',c:'Shanghai',n:'China'},{i:'HKG',c:'Hong Kong',n:'HK'},{i:'SIN',c:'Singapore',n:'Singapore'},{i:'BKK',c:'Bangkok',n:'Thailand'},{i:'DEL',c:'New Delhi',n:'India'},{i:'BOM',c:'Mumbai',n:'India'},{i:'SYD',c:'Sydney',n:'Australia'},{i:'MEL',c:'Melbourne',n:'Australia'},{i:'AKL',c:'Auckland',n:'NZ'}]
+const AIRPORTS=[{i:'LHR',c:'London Heathrow',n:'UK'},{i:'LGW',c:'London Gatwick',n:'UK'},{i:'STN',c:'London Stansted',n:'UK'},{i:'JFK',c:'New York JFK',n:'USA'},{i:'EWR',c:'Newark',n:'USA'},{i:'LAX',c:'Los Angeles',n:'USA'},{i:'ORD',c:'Chicago',n:'USA'},{i:'ATL',c:'Atlanta',n:'USA'},{i:'DFW',c:'Dallas',n:'USA'},{i:'MIA',c:'Miami',n:'USA'},{i:'SFO',c:'San Francisco',n:'USA'},{i:'BOS',c:'Boston',n:'USA'},{i:'SEA',c:'Seattle',n:'USA'},{i:'IAH',c:'Houston Bush',n:'USA'},{i:'PHL',c:'Philadelphia',n:'USA'},{i:'MCI',c:'Kansas City',n:'USA'},{i:'YYZ',c:'Toronto',n:'Canada'},{i:'YVR',c:'Vancouver',n:'Canada'},{i:'MEX',c:'Mexico City',n:'Mexico'},{i:'GDL',c:'Guadalajara',n:'Mexico'},{i:'MTY',c:'Monterrey',n:'Mexico'},{i:'GRU',c:'São Paulo',n:'Brazil'},{i:'GIG',c:'Rio de Janeiro',n:'Brazil'},{i:'EZE',c:'Buenos Aires',n:'Argentina'},{i:'BOG',c:'Bogotá',n:'Colombia'},{i:'SCL',c:'Santiago',n:'Chile'},{i:'CDG',c:'Paris CDG',n:'France'},{i:'AMS',c:'Amsterdam',n:'Netherlands'},{i:'FRA',c:'Frankfurt',n:'Germany'},{i:'MUC',c:'Munich',n:'Germany'},{i:'BER',c:'Berlin',n:'Germany'},{i:'MAD',c:'Madrid',n:'Spain'},{i:'BCN',c:'Barcelona',n:'Spain'},{i:'FCO',c:'Rome',n:'Italy'},{i:'ZRH',c:'Zurich',n:'Switzerland'},{i:'LIS',c:'Lisbon',n:'Portugal'},{i:'DUB',c:'Dublin',n:'Ireland'},{i:'CPH',c:'Copenhagen',n:'Denmark'},{i:'OSL',c:'Oslo',n:'Norway'},{i:'ARN',c:'Stockholm',n:'Sweden'},{i:'IST',c:'Istanbul',n:'Turkey'},{i:'DXB',c:'Dubai',n:'UAE'},{i:'DOH',c:'Doha',n:'Qatar'},{i:'CAI',c:'Cairo',n:'Egypt'},{i:'CMN',c:'Casablanca',n:'Morocco'},{i:'JNB',c:'Johannesburg',n:'South Africa'},{i:'CPT',c:'Cape Town',n:'South Africa'},{i:'NBO',c:'Nairobi',n:'Kenya'},{i:'ACC',c:'Accra',n:'Ghana'},{i:'NRT',c:'Tokyo Narita',n:'Japan'},{i:'HND',c:'Tokyo Haneda',n:'Japan'},{i:'ICN',c:'Seoul',n:'South Korea'},{i:'PVG',c:'Shanghai',n:'China'},{i:'HKG',c:'Hong Kong',n:'HK'},{i:'SIN',c:'Singapore',n:'Singapore'},{i:'BKK',c:'Bangkok',n:'Thailand'},{i:'DEL',c:'New Delhi',n:'India'},{i:'BOM',c:'Mumbai',n:'India'},{i:'SYD',c:'Sydney',n:'Australia'},{i:'MEL',c:'Melbourne',n:'Australia'},{i:'AKL',c:'Auckland',n:'NZ'}]
 
-let acTimer
-async function acCity(inp){
-  clearTimeout(acTimer)
-  const v=inp.value.trim(), l=document.getElementById('hcl')
+const CITIES_DB=[
+  ['New York','USA'],['Los Angeles','USA'],['Chicago','USA'],['Houston','USA'],['Miami','USA'],
+  ['Dallas','USA'],['Atlanta','USA'],['Boston','USA'],['Seattle','USA'],['Philadelphia','USA'],
+  ['San Francisco','USA'],['Las Vegas','USA'],['Denver','USA'],['Washington DC','USA'],['Phoenix','USA'],
+  ['Detroit','USA'],['Minneapolis','USA'],['Kansas City','USA'],['Portland','USA'],['Orlando','USA'],
+  ['Toronto','Canada'],['Vancouver','Canada'],['Montreal','Canada'],['Calgary','Canada'],['Ottawa','Canada'],
+  ['Mexico City','Mexico'],['Guadalajara','Mexico'],['Monterrey','Mexico'],['Cancún','Mexico'],
+  ['São Paulo','Brazil'],['Rio de Janeiro','Brazil'],['Brasília','Brazil'],['Salvador','Brazil'],
+  ['Belo Horizonte','Brazil'],['Fortaleza','Brazil'],['Manaus','Brazil'],['Recife','Brazil'],
+  ['Buenos Aires','Argentina'],['Córdoba','Argentina'],['Rosario','Argentina'],['Mendoza','Argentina'],
+  ['Bogotá','Colombia'],['Medellín','Colombia'],['Cali','Colombia'],['Barranquilla','Colombia'],
+  ['Lima','Peru'],['Santiago','Chile'],['Montevideo','Uruguay'],['Asunción','Paraguay'],
+  ['Quito','Ecuador'],['Guayaquil','Ecuador'],['Caracas','Venezuela'],['Port-au-Prince','Haiti'],
+  ['Panama City','Panama'],['Willemstad','Curaçao'],
+  ['London','UK'],['Manchester','UK'],['Birmingham','UK'],['Glasgow','UK'],
+  ['Edinburgh','UK'],['Liverpool','UK'],['Leeds','UK'],['Bristol','UK'],
+  ['Paris','France'],['Lyon','France'],['Marseille','France'],['Nice','France'],['Toulouse','France'],
+  ['Berlin','Germany'],['Munich','Germany'],['Hamburg','Germany'],['Frankfurt','Germany'],
+  ['Cologne','Germany'],['Stuttgart','Germany'],['Düsseldorf','Germany'],
+  ['Madrid','Spain'],['Barcelona','Spain'],['Seville','Spain'],['Valencia','Spain'],['Bilbao','Spain'],
+  ['Lisbon','Portugal'],['Porto','Portugal'],
+  ['Amsterdam','Netherlands'],['Rotterdam','Netherlands'],['Utrecht','Netherlands'],
+  ['Brussels','Belgium'],['Antwerp','Belgium'],['Ghent','Belgium'],
+  ['Zurich','Switzerland'],['Geneva','Switzerland'],['Basel','Switzerland'],['Bern','Switzerland'],
+  ['Vienna','Austria'],['Salzburg','Austria'],['Graz','Austria'],
+  ['Rome','Italy'],['Milan','Italy'],['Naples','Italy'],['Turin','Italy'],['Florence','Italy'],
+  ['Stockholm','Sweden'],['Gothenburg','Sweden'],['Malmö','Sweden'],
+  ['Oslo','Norway'],['Bergen','Norway'],
+  ['Copenhagen','Denmark'],['Helsinki','Finland'],['Dublin','Ireland'],
+  ['Warsaw','Poland'],['Kraków','Poland'],['Wrocław','Poland'],
+  ['Prague','Czechia'],['Bratislava','Slovakia'],['Budapest','Hungary'],
+  ['Zagreb','Croatia'],['Sarajevo','Bosnia'],['Belgrade','Serbia'],['Bucharest','Romania'],
+  ['Sofia','Bulgaria'],['Athens','Greece'],['Thessaloniki','Greece'],
+  ['Istanbul','Turkey'],['Ankara','Turkey'],['Izmir','Turkey'],
+  ['Kyiv','Ukraine'],['Lisbon','Portugal'],
+  ['Cairo','Egypt'],['Alexandria','Egypt'],
+  ['Casablanca','Morocco'],['Rabat','Morocco'],['Marrakech','Morocco'],['Fez','Morocco'],
+  ['Tunis','Tunisia'],['Algiers','Algeria'],['Oran','Algeria'],
+  ['Lagos','Nigeria'],['Abuja','Nigeria'],['Kano','Nigeria'],
+  ['Accra','Ghana'],['Kumasi','Ghana'],
+  ['Dakar','Senegal'],['Abidjan','Ivory Coast'],['Kinshasa','DR Congo'],
+  ['Johannesburg','South Africa'],['Cape Town','South Africa'],['Durban','South Africa'],['Pretoria','South Africa'],
+  ['Nairobi','Kenya'],['Addis Ababa','Ethiopia'],['Praia','Cape Verde'],
+  ['Dubai','UAE'],['Abu Dhabi','UAE'],['Sharjah','UAE'],
+  ['Doha','Qatar'],['Riyadh','Saudi Arabia'],['Jeddah','Saudi Arabia'],['Mecca','Saudi Arabia'],
+  ['Amman','Jordan'],['Beirut','Lebanon'],['Damascus','Syria'],
+  ['Baghdad','Iraq'],['Erbil','Iraq'],['Basra','Iraq'],
+  ['Tehran','Iran'],['Mashhad','Iran'],['Isfahan','Iran'],
+  ['Kuwait City','Kuwait'],['Manama','Bahrain'],['Muscat','Oman'],
+  ['Tashkent','Uzbekistan'],['Samarkand','Uzbekistan'],
+  ['Tokyo','Japan'],['Osaka','Japan'],['Kyoto','Japan'],['Nagoya','Japan'],['Fukuoka','Japan'],
+  ['Seoul','South Korea'],['Busan','South Korea'],['Incheon','South Korea'],
+  ['Beijing','China'],['Shanghai','China'],['Guangzhou','China'],['Shenzhen','China'],['Chengdu','China'],
+  ['Hong Kong','HK'],['Taipei','Taiwan'],
+  ['Bangkok','Thailand'],['Chiang Mai','Thailand'],['Phuket','Thailand'],
+  ['Singapore','Singapore'],['Kuala Lumpur','Malaysia'],
+  ['Jakarta','Indonesia'],['Bali','Indonesia'],['Surabaya','Indonesia'],
+  ['Manila','Philippines'],['Cebu','Philippines'],
+  ['Ho Chi Minh City','Vietnam'],['Hanoi','Vietnam'],['Da Nang','Vietnam'],
+  ['New Delhi','India'],['Mumbai','India'],['Bangalore','India'],['Kolkata','India'],['Chennai','India'],['Hyderabad','India'],
+  ['Karachi','Pakistan'],['Lahore','Pakistan'],['Islamabad','Pakistan'],
+  ['Dhaka','Bangladesh'],['Colombo','Sri Lanka'],
+  ['Sydney','Australia'],['Melbourne','Australia'],['Brisbane','Australia'],
+  ['Perth','Australia'],['Adelaide','Australia'],['Gold Coast','Australia'],
+  ['Auckland','New Zealand'],['Wellington','New Zealand'],['Christchurch','New Zealand'],
+]
+
+function acCity(inp){
+  const v=inp.value.trim().toLowerCase(), l=document.getElementById('hcl')
   if(v.length<2){l.style.display='none';return}
-  acTimer=setTimeout(async()=>{
-    try{
-      const r=await fetch('https://api.teleport.org/api/cities/?search='+encodeURIComponent(v)+'&limit=6')
-      const d=await r.json()
-      const items=d._embedded?.['city:search-results']||[]
-      if(!items.length){l.style.display='none';return}
-      l.innerHTML=items.map(it=>{
-        const n=it.matching_full_name||''
-        const parts=n.split(',')
-        const city=parts[0]?.trim()||n
-        const rest=parts.slice(1).join(',').trim()
-        return '<div class="ac-item" onmousedown="pickCity(event,\''+city+'\')"><span class="cm">'+city+'</span><span class="cs">'+rest+'</span></div>'
-      }).join('')
-      l.style.display='block'
-    }catch(e){l.style.display='none'}
-  },300)
+  const m=CITIES_DB.filter(([c])=>c.toLowerCase().startsWith(v)||c.toLowerCase().includes(v)).slice(0,8)
+  if(!m.length){l.style.display='none';return}
+  l.innerHTML=m.map(([c,n])=>'<div class="ac-item" onmousedown="pickCity(event,\''+c.replace(/'/g,"\\'")+'\')" ><span class="cm">'+c+'</span><span class="cs">'+n+'</span></div>').join('')
+  l.style.display='block'
 }
 
 function acAirport(inp){
