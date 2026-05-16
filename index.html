@@ -369,13 +369,9 @@
       <div class="tool-card" id="detailsCard" style="opacity:0.4;pointer-events:none;transition:opacity 0.2s">
         <p class="tool-step">2 — Trip details</p>
         <div class="form-row">
-          <div class="form-group">
+          <div class="form-group" style="grid-column:1/-1">
             <label class="form-label">Flying from</label>
-            <div class="ac-wrap"><input id="homeCity" class="form-input" type="text" placeholder="e.g. London, São Paulo, Tokyo" autocomplete="off" oninput="acCity(this)" onkeydown="acNav(event,'hcl')"><div id="hcl" class="ac-list"></div></div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Home airport</label>
-            <div class="ac-wrap"><input id="homeAirport" class="form-input" type="text" placeholder="e.g. LHR, London, Tokyo" autocomplete="off" style="text-transform:uppercase" oninput="acAirport(this)" onkeydown="acNav(event,'hal')"><div id="hal" class="ac-list"></div></div>
+            <div class="ac-wrap"><input id="homeCity" class="form-input" type="text" placeholder="City or airport — e.g. London, Karachi, JFK" autocomplete="off" oninput="acOrigin(this)" onkeydown="acNav(event,'hol')"><div id="hol" class="ac-list"></div></div>
           </div>
         </div>
         <div class="form-row">
@@ -558,8 +554,8 @@ async function generate() {
         teamSlug: selectedTeam.slug,
         teamName: selectedTeam.name,
         teamGroup: selectedTeam.group,
-        homeCity: document.getElementById('homeCity').value || 'your home city',
-        homeAirport: document.getElementById('homeAirport').value.toUpperCase() || 'HOME',
+        homeCity: selectedOrigin.city || document.getElementById('homeCity').value || 'your home city',
+        homeAirport: selectedOrigin.iata || 'HOME',
         dateFrom: document.getElementById('dateFrom').value,
         dateTo: document.getElementById('dateTo').value,
         partySize: document.getElementById('partySize').value,
@@ -672,104 +668,99 @@ function renderItinerary(itin) {
 }
 
 
-const AIRPORTS=[{i:'LHR',c:'London Heathrow',n:'UK'},{i:'LGW',c:'London Gatwick',n:'UK'},{i:'STN',c:'London Stansted',n:'UK'},{i:'JFK',c:'New York JFK',n:'USA'},{i:'EWR',c:'Newark',n:'USA'},{i:'LAX',c:'Los Angeles',n:'USA'},{i:'ORD',c:'Chicago',n:'USA'},{i:'ATL',c:'Atlanta',n:'USA'},{i:'DFW',c:'Dallas',n:'USA'},{i:'MIA',c:'Miami',n:'USA'},{i:'SFO',c:'San Francisco',n:'USA'},{i:'BOS',c:'Boston',n:'USA'},{i:'SEA',c:'Seattle',n:'USA'},{i:'IAH',c:'Houston Bush',n:'USA'},{i:'PHL',c:'Philadelphia',n:'USA'},{i:'MCI',c:'Kansas City',n:'USA'},{i:'YYZ',c:'Toronto',n:'Canada'},{i:'YVR',c:'Vancouver',n:'Canada'},{i:'MEX',c:'Mexico City',n:'Mexico'},{i:'GDL',c:'Guadalajara',n:'Mexico'},{i:'MTY',c:'Monterrey',n:'Mexico'},{i:'GRU',c:'São Paulo',n:'Brazil'},{i:'GIG',c:'Rio de Janeiro',n:'Brazil'},{i:'EZE',c:'Buenos Aires',n:'Argentina'},{i:'BOG',c:'Bogotá',n:'Colombia'},{i:'SCL',c:'Santiago',n:'Chile'},{i:'CDG',c:'Paris CDG',n:'France'},{i:'AMS',c:'Amsterdam',n:'Netherlands'},{i:'FRA',c:'Frankfurt',n:'Germany'},{i:'MUC',c:'Munich',n:'Germany'},{i:'BER',c:'Berlin',n:'Germany'},{i:'MAD',c:'Madrid',n:'Spain'},{i:'BCN',c:'Barcelona',n:'Spain'},{i:'FCO',c:'Rome',n:'Italy'},{i:'ZRH',c:'Zurich',n:'Switzerland'},{i:'LIS',c:'Lisbon',n:'Portugal'},{i:'DUB',c:'Dublin',n:'Ireland'},{i:'CPH',c:'Copenhagen',n:'Denmark'},{i:'OSL',c:'Oslo',n:'Norway'},{i:'ARN',c:'Stockholm',n:'Sweden'},{i:'IST',c:'Istanbul',n:'Turkey'},{i:'DXB',c:'Dubai',n:'UAE'},{i:'DOH',c:'Doha',n:'Qatar'},{i:'CAI',c:'Cairo',n:'Egypt'},{i:'CMN',c:'Casablanca',n:'Morocco'},{i:'JNB',c:'Johannesburg',n:'South Africa'},{i:'CPT',c:'Cape Town',n:'South Africa'},{i:'NBO',c:'Nairobi',n:'Kenya'},{i:'ACC',c:'Accra',n:'Ghana'},{i:'NRT',c:'Tokyo Narita',n:'Japan'},{i:'HND',c:'Tokyo Haneda',n:'Japan'},{i:'ICN',c:'Seoul',n:'South Korea'},{i:'PVG',c:'Shanghai',n:'China'},{i:'HKG',c:'Hong Kong',n:'HK'},{i:'SIN',c:'Singapore',n:'Singapore'},{i:'BKK',c:'Bangkok',n:'Thailand'},{i:'DEL',c:'New Delhi',n:'India'},{i:'BOM',c:'Mumbai',n:'India'},{i:'SYD',c:'Sydney',n:'Australia'},{i:'MEL',c:'Melbourne',n:'Australia'},{i:'AKL',c:'Auckland',n:'NZ'}]
-
-const CITIES_DB=[
-  ['New York','USA'],['Los Angeles','USA'],['Chicago','USA'],['Houston','USA'],['Miami','USA'],
-  ['Dallas','USA'],['Atlanta','USA'],['Boston','USA'],['Seattle','USA'],['Philadelphia','USA'],
-  ['San Francisco','USA'],['Las Vegas','USA'],['Denver','USA'],['Washington DC','USA'],['Phoenix','USA'],
-  ['Detroit','USA'],['Minneapolis','USA'],['Kansas City','USA'],['Portland','USA'],['Orlando','USA'],
-  ['Toronto','Canada'],['Vancouver','Canada'],['Montreal','Canada'],['Calgary','Canada'],['Ottawa','Canada'],
-  ['Mexico City','Mexico'],['Guadalajara','Mexico'],['Monterrey','Mexico'],['Cancún','Mexico'],
-  ['São Paulo','Brazil'],['Rio de Janeiro','Brazil'],['Brasília','Brazil'],['Salvador','Brazil'],
-  ['Belo Horizonte','Brazil'],['Fortaleza','Brazil'],['Manaus','Brazil'],['Recife','Brazil'],
-  ['Buenos Aires','Argentina'],['Córdoba','Argentina'],['Rosario','Argentina'],['Mendoza','Argentina'],
-  ['Bogotá','Colombia'],['Medellín','Colombia'],['Cali','Colombia'],['Barranquilla','Colombia'],
-  ['Lima','Peru'],['Santiago','Chile'],['Montevideo','Uruguay'],['Asunción','Paraguay'],
-  ['Quito','Ecuador'],['Guayaquil','Ecuador'],['Caracas','Venezuela'],['Port-au-Prince','Haiti'],
-  ['Panama City','Panama'],['Willemstad','Curaçao'],
-  ['London','UK'],['Manchester','UK'],['Birmingham','UK'],['Glasgow','UK'],
-  ['Edinburgh','UK'],['Liverpool','UK'],['Leeds','UK'],['Bristol','UK'],
-  ['Paris','France'],['Lyon','France'],['Marseille','France'],['Nice','France'],['Toulouse','France'],
-  ['Berlin','Germany'],['Munich','Germany'],['Hamburg','Germany'],['Frankfurt','Germany'],
-  ['Cologne','Germany'],['Stuttgart','Germany'],['Düsseldorf','Germany'],
-  ['Madrid','Spain'],['Barcelona','Spain'],['Seville','Spain'],['Valencia','Spain'],['Bilbao','Spain'],
-  ['Lisbon','Portugal'],['Porto','Portugal'],
-  ['Amsterdam','Netherlands'],['Rotterdam','Netherlands'],['Utrecht','Netherlands'],
-  ['Brussels','Belgium'],['Antwerp','Belgium'],['Ghent','Belgium'],
-  ['Zurich','Switzerland'],['Geneva','Switzerland'],['Basel','Switzerland'],['Bern','Switzerland'],
-  ['Vienna','Austria'],['Salzburg','Austria'],['Graz','Austria'],
-  ['Rome','Italy'],['Milan','Italy'],['Naples','Italy'],['Turin','Italy'],['Florence','Italy'],
-  ['Stockholm','Sweden'],['Gothenburg','Sweden'],['Malmö','Sweden'],
-  ['Oslo','Norway'],['Bergen','Norway'],
-  ['Copenhagen','Denmark'],['Helsinki','Finland'],['Dublin','Ireland'],
-  ['Warsaw','Poland'],['Kraków','Poland'],['Wrocław','Poland'],
-  ['Prague','Czechia'],['Bratislava','Slovakia'],['Budapest','Hungary'],
-  ['Zagreb','Croatia'],['Sarajevo','Bosnia'],['Belgrade','Serbia'],['Bucharest','Romania'],
-  ['Sofia','Bulgaria'],['Athens','Greece'],['Thessaloniki','Greece'],
-  ['Istanbul','Turkey'],['Ankara','Turkey'],['Izmir','Turkey'],
-  ['Kyiv','Ukraine'],['Lisbon','Portugal'],
-  ['Cairo','Egypt'],['Alexandria','Egypt'],
-  ['Casablanca','Morocco'],['Rabat','Morocco'],['Marrakech','Morocco'],['Fez','Morocco'],
-  ['Tunis','Tunisia'],['Algiers','Algeria'],['Oran','Algeria'],
-  ['Lagos','Nigeria'],['Abuja','Nigeria'],['Kano','Nigeria'],
-  ['Accra','Ghana'],['Kumasi','Ghana'],
-  ['Dakar','Senegal'],['Abidjan','Ivory Coast'],['Kinshasa','DR Congo'],
-  ['Johannesburg','South Africa'],['Cape Town','South Africa'],['Durban','South Africa'],['Pretoria','South Africa'],
-  ['Nairobi','Kenya'],['Addis Ababa','Ethiopia'],['Praia','Cape Verde'],
-  ['Dubai','UAE'],['Abu Dhabi','UAE'],['Sharjah','UAE'],
-  ['Doha','Qatar'],['Riyadh','Saudi Arabia'],['Jeddah','Saudi Arabia'],['Mecca','Saudi Arabia'],
-  ['Amman','Jordan'],['Beirut','Lebanon'],['Damascus','Syria'],
-  ['Baghdad','Iraq'],['Erbil','Iraq'],['Basra','Iraq'],
-  ['Tehran','Iran'],['Mashhad','Iran'],['Isfahan','Iran'],
-  ['Kuwait City','Kuwait'],['Manama','Bahrain'],['Muscat','Oman'],
-  ['Tashkent','Uzbekistan'],['Samarkand','Uzbekistan'],
-  ['Tokyo','Japan'],['Osaka','Japan'],['Kyoto','Japan'],['Nagoya','Japan'],['Fukuoka','Japan'],
-  ['Seoul','South Korea'],['Busan','South Korea'],['Incheon','South Korea'],
-  ['Beijing','China'],['Shanghai','China'],['Guangzhou','China'],['Shenzhen','China'],['Chengdu','China'],
-  ['Hong Kong','HK'],['Taipei','Taiwan'],
-  ['Bangkok','Thailand'],['Chiang Mai','Thailand'],['Phuket','Thailand'],
-  ['Singapore','Singapore'],['Kuala Lumpur','Malaysia'],
-  ['Jakarta','Indonesia'],['Bali','Indonesia'],['Surabaya','Indonesia'],
-  ['Manila','Philippines'],['Cebu','Philippines'],
-  ['Ho Chi Minh City','Vietnam'],['Hanoi','Vietnam'],['Da Nang','Vietnam'],
-  ['New Delhi','India'],['Mumbai','India'],['Bangalore','India'],['Kolkata','India'],['Chennai','India'],['Hyderabad','India'],
-  ['Karachi','Pakistan'],['Lahore','Pakistan'],['Islamabad','Pakistan'],
-  ['Dhaka','Bangladesh'],['Colombo','Sri Lanka'],
-  ['Sydney','Australia'],['Melbourne','Australia'],['Brisbane','Australia'],
-  ['Perth','Australia'],['Adelaide','Australia'],['Gold Coast','Australia'],
-  ['Auckland','New Zealand'],['Wellington','New Zealand'],['Christchurch','New Zealand'],
+const ORIGINS=[
+  ['New York','USA','JFK'],['Los Angeles','USA','LAX'],['Chicago','USA','ORD'],['Houston','USA','IAH'],
+  ['Miami','USA','MIA'],['Dallas','USA','DFW'],['Atlanta','USA','ATL'],['Boston','USA','BOS'],
+  ['Seattle','USA','SEA'],['Philadelphia','USA','PHL'],['San Francisco','USA','SFO'],
+  ['Las Vegas','USA','LAS'],['Denver','USA','DEN'],['Washington DC','USA','IAD'],
+  ['Phoenix','USA','PHX'],['Detroit','USA','DTW'],['Minneapolis','USA','MSP'],
+  ['Kansas City','USA','MCI'],['Portland','USA','PDX'],['Orlando','USA','MCO'],
+  ['Newark','USA','EWR'],
+  ['Toronto','Canada','YYZ'],['Vancouver','Canada','YVR'],['Montreal','Canada','YUL'],
+  ['Calgary','Canada','YYC'],['Ottawa','Canada','YOW'],
+  ['Mexico City','Mexico','MEX'],['Guadalajara','Mexico','GDL'],['Monterrey','Mexico','MTY'],['Cancún','Mexico','CUN'],
+  ['São Paulo','Brazil','GRU'],['Rio de Janeiro','Brazil','GIG'],['Brasília','Brazil','BSB'],
+  ['Salvador','Brazil','SSA'],['Fortaleza','Brazil','FOR'],['Recife','Brazil','REC'],['Manaus','Brazil','MAO'],
+  ['Buenos Aires','Argentina','EZE'],['Córdoba','Argentina','COR'],['Rosario','Argentina','ROS'],
+  ['Bogotá','Colombia','BOG'],['Medellín','Colombia','MDE'],['Cali','Colombia','CLO'],['Barranquilla','Colombia','BAQ'],
+  ['Lima','Peru','LIM'],['Santiago','Chile','SCL'],['Montevideo','Uruguay','MVD'],
+  ['Asunción','Paraguay','ASU'],['Quito','Ecuador','UIO'],['Guayaquil','Ecuador','GYE'],
+  ['Caracas','Venezuela','CCS'],['Port-au-Prince','Haiti','PAP'],['Panama City','Panama','PTY'],
+  ['Willemstad','Curaçao','CUR'],
+  ['London','UK','LHR'],['Manchester','UK','MAN'],['Birmingham','UK','BHX'],
+  ['Glasgow','UK','GLA'],['Edinburgh','UK','EDI'],['Liverpool','UK','LPL'],['Bristol','UK','BRS'],
+  ['Paris','France','CDG'],['Lyon','France','LYS'],['Marseille','France','MRS'],['Nice','France','NCE'],
+  ['Berlin','Germany','BER'],['Munich','Germany','MUC'],['Hamburg','Germany','HAM'],
+  ['Frankfurt','Germany','FRA'],['Cologne','Germany','CGN'],['Düsseldorf','Germany','DUS'],
+  ['Madrid','Spain','MAD'],['Barcelona','Spain','BCN'],['Seville','Spain','SVQ'],['Valencia','Spain','VLC'],['Bilbao','Spain','BIO'],
+  ['Lisbon','Portugal','LIS'],['Porto','Portugal','OPO'],
+  ['Amsterdam','Netherlands','AMS'],['Rotterdam','Netherlands','RTM'],
+  ['Brussels','Belgium','BRU'],['Antwerp','Belgium','ANR'],
+  ['Zurich','Switzerland','ZRH'],['Geneva','Switzerland','GVA'],['Basel','Switzerland','BSL'],
+  ['Vienna','Austria','VIE'],['Salzburg','Austria','SZG'],
+  ['Rome','Italy','FCO'],['Milan','Italy','MXP'],['Naples','Italy','NAP'],['Turin','Italy','TRN'],['Florence','Italy','FLR'],
+  ['Stockholm','Sweden','ARN'],['Gothenburg','Sweden','GOT'],['Malmö','Sweden','MMX'],
+  ['Oslo','Norway','OSL'],['Bergen','Norway','BGO'],
+  ['Copenhagen','Denmark','CPH'],['Helsinki','Finland','HEL'],['Dublin','Ireland','DUB'],
+  ['Warsaw','Poland','WAW'],['Kraków','Poland','KRK'],['Wrocław','Poland','WRO'],
+  ['Prague','Czechia','PRG'],['Budapest','Hungary','BUD'],['Bratislava','Slovakia','BTS'],
+  ['Zagreb','Croatia','ZAG'],['Sarajevo','Bosnia','SJJ'],['Belgrade','Serbia','BEG'],
+  ['Bucharest','Romania','OTP'],['Sofia','Bulgaria','SOF'],
+  ['Athens','Greece','ATH'],['Thessaloniki','Greece','SKG'],
+  ['Istanbul','Turkey','IST'],['Ankara','Turkey','ESB'],['Izmir','Turkey','ADB'],
+  ['Kyiv','Ukraine','KBP'],
+  ['Cairo','Egypt','CAI'],['Alexandria','Egypt','HBE'],
+  ['Casablanca','Morocco','CMN'],['Marrakech','Morocco','RAK'],['Rabat','Morocco','RBA'],
+  ['Tunis','Tunisia','TUN'],['Algiers','Algeria','ALG'],['Oran','Algeria','ORN'],
+  ['Lagos','Nigeria','LOS'],['Abuja','Nigeria','ABV'],['Kano','Nigeria','KAN'],
+  ['Accra','Ghana','ACC'],['Kumasi','Ghana','KMS'],
+  ['Dakar','Senegal','DSS'],['Abidjan','Ivory Coast','ABJ'],['Kinshasa','DR Congo','FIH'],
+  ['Johannesburg','South Africa','JNB'],['Cape Town','South Africa','CPT'],
+  ['Durban','South Africa','DUR'],['Pretoria','South Africa','PRY'],
+  ['Nairobi','Kenya','NBO'],['Addis Ababa','Ethiopia','ADD'],['Praia','Cape Verde','RAI'],
+  ['Dubai','UAE','DXB'],['Abu Dhabi','UAE','AUH'],['Sharjah','UAE','SHJ'],
+  ['Doha','Qatar','DOH'],['Riyadh','Saudi Arabia','RUH'],['Jeddah','Saudi Arabia','JED'],
+  ['Amman','Jordan','AMM'],['Baghdad','Iraq','BGW'],['Erbil','Iraq','EBL'],
+  ['Tehran','Iran','IKA'],['Mashhad','Iran','MHD'],
+  ['Kuwait City','Kuwait','KWI'],['Manama','Bahrain','BAH'],['Muscat','Oman','MCT'],
+  ['Tashkent','Uzbekistan','TAS'],['Samarkand','Uzbekistan','SKD'],
+  ['Tokyo','Japan','NRT'],['Osaka','Japan','KIX'],['Nagoya','Japan','NGO'],['Fukuoka','Japan','FUK'],
+  ['Seoul','South Korea','ICN'],['Busan','South Korea','PUS'],
+  ['Beijing','China','PEK'],['Shanghai','China','PVG'],['Guangzhou','China','CAN'],['Chengdu','China','CTU'],
+  ['Hong Kong','HK','HKG'],['Taipei','Taiwan','TPE'],
+  ['Bangkok','Thailand','BKK'],['Chiang Mai','Thailand','CNX'],
+  ['Singapore','Singapore','SIN'],['Kuala Lumpur','Malaysia','KUL'],
+  ['Jakarta','Indonesia','CGK'],['Bali','Indonesia','DPS'],
+  ['Manila','Philippines','MNL'],
+  ['Ho Chi Minh City','Vietnam','SGN'],['Hanoi','Vietnam','HAN'],
+  ['New Delhi','India','DEL'],['Mumbai','India','BOM'],['Bangalore','India','BLR'],
+  ['Kolkata','India','CCU'],['Chennai','India','MAA'],['Hyderabad','India','HYD'],
+  ['Karachi','Pakistan','KHI'],['Lahore','Pakistan','LHE'],['Islamabad','Pakistan','ISB'],
+  ['Dhaka','Bangladesh','DAC'],['Colombo','Sri Lanka','CMB'],
+  ['Sydney','Australia','SYD'],['Melbourne','Australia','MEL'],['Brisbane','Australia','BNE'],
+  ['Perth','Australia','PER'],['Adelaide','Australia','ADL'],
+  ['Auckland','New Zealand','AKL'],['Wellington','New Zealand','WLG'],
 ]
 
-function acCity(inp){
-  const v=inp.value.trim().toLowerCase(), l=document.getElementById('hcl')
+let selectedOrigin={city:'',iata:''}
+
+function acOrigin(inp){
+  selectedOrigin={city:'',iata:''}
+  const v=inp.value.trim().toLowerCase(), l=document.getElementById('hol')
   if(v.length<2){l.style.display='none';return}
-  const m=CITIES_DB.filter(([c])=>c.toLowerCase().startsWith(v)||c.toLowerCase().includes(v)).slice(0,8)
+  const m=ORIGINS.filter(([c,,i])=>
+    c.toLowerCase().startsWith(v)||c.toLowerCase().includes(v)||i.toLowerCase()===v||i.toLowerCase().startsWith(v)
+  ).slice(0,8)
   if(!m.length){l.style.display='none';return}
-  l.innerHTML=m.map(([c,n])=>'<div class="ac-item" onmousedown="pickCity(event,\''+c.replace(/'/g,"\\'")+'\')" ><span class="cm">'+c+'</span><span class="cs">'+n+'</span></div>').join('')
+  l.innerHTML=m.map(([c,n,i])=>'<div class="ac-item" onmousedown="pickOrigin(event,\''+c.replace(/'/g,"\\'")+'\',\''+i+'\')"><span class="ci">'+i+'</span><span class="cm">'+c+'</span><span class="cs">'+n+'</span></div>').join('')
   l.style.display='block'
 }
 
-function acAirport(inp){
-  const v=inp.value.toUpperCase(), l=document.getElementById('hal')
-  if(v.length<2){l.style.display='none';return}
-  const m=AIRPORTS.filter(a=>a.i.includes(v)||a.c.toUpperCase().includes(v)||a.n.toUpperCase().includes(v)).slice(0,7)
-  if(!m.length){l.style.display='none';return}
-  l.innerHTML=m.map(a=>'<div class="ac-item" onmousedown="pickAirport(event,\''+a.i+'\')"><span class="ci">'+a.i+'</span><span class="cm">'+a.c+'</span><span class="cs">'+a.n+'</span></div>').join('')
-  l.style.display='block'
-}
-
-function pickCity(e,val){
+function pickOrigin(e,city,iata){
   e.preventDefault()
-  document.getElementById('homeCity').value=val
-  document.getElementById('hcl').style.display='none'
-  updateGenerateBtn&&updateGenerateBtn()
-}
-
-function pickAirport(e,iata){
-  e.preventDefault()
-  document.getElementById('homeAirport').value=iata
-  document.getElementById('hal').style.display='none'
+  selectedOrigin={city,iata}
+  document.getElementById('homeCity').value=city+' ('+iata+')'
+  document.getElementById('hol').style.display='none'
 }
 
 function acNav(e,lid){
