@@ -30,18 +30,66 @@ module.exports = async (req, res) => {
   }
 
   const MATCHES = {
-    'brazil': 'Brazil vs Morocco (Jun 13, MetLife NY), Brazil vs Haiti (Jun 19, Philadelphia), Scotland vs Brazil (Jun 24, Miami)',
-    'england': 'England vs Croatia (Jun 17, Dallas), England vs Ghana (Jun 23, Boston), Panama vs England (Jun 27, MetLife NY)',
-    'argentina': 'Argentina vs Algeria (Jun 16, Kansas City), Argentina vs Austria (Jun 22, Dallas), Jordan vs Argentina (Jun 27, Dallas)',
-    'france': 'France vs Senegal (Jun 16, MetLife NY), France vs Iraq (Jun 22, Philadelphia), Norway vs France (Jun 26, Boston)',
-    'germany': 'Germany vs Curacao (Jun 14, Houston), Germany vs Ivory Coast (Jun 20, Toronto), Ecuador vs Germany (Jun 25, MetLife NY)',
-    'spain': 'Spain vs Cape Verde (Jun 15, Atlanta), Spain vs Saudi Arabia (Jun 21, Atlanta), Uruguay vs Spain (Jun 26, Guadalajara)',
-    'portugal': 'Portugal vs DR Congo (Jun 17, Houston), Portugal vs Uzbekistan (Jun 23, Houston), Colombia vs Portugal (Jun 27, Miami)',
-    'usa': 'USA vs Paraguay (Jun 12, Los Angeles), USA vs Australia (Jun 19, Seattle), Turkey vs USA (Jun 25, Los Angeles)',
-    'mexico': 'Mexico vs South Africa (Jun 11, Mexico City), Mexico vs South Korea (Jun 18, Guadalajara), Czechia vs Mexico (Jun 24, Mexico City)',
-    'netherlands': 'Netherlands vs Japan (Jun 14, Dallas), Netherlands vs Sweden (Jun 20, Houston), Tunisia vs Netherlands (Jun 25, Kansas City)',
-    'canada': 'Canada vs Bosnia (Jun 12, Toronto), Canada vs Qatar (Jun 18, Vancouver), Switzerland vs Canada (Jun 24, Vancouver)',
-    'morocco': 'Brazil vs Morocco (Jun 13, MetLife NY), Morocco vs Scotland (Jun 19, Boston), Morocco vs Haiti (Jun 24, Atlanta)',
+    // Group A
+    'mexico':       'Mexico vs South Africa (Jun 11, Mexico City), Mexico vs South Korea (Jun 18, Guadalajara), Czechia vs Mexico (Jun 24, Mexico City)',
+    'south-africa': 'South Africa vs Mexico (Jun 11, Mexico City), South Africa vs Czechia (Jun 17, Los Angeles), South Korea vs South Africa (Jun 24, Dallas)',
+    'south-korea':  'South Korea vs Czechia (Jun 11, Los Angeles), South Korea vs Mexico (Jun 18, Guadalajara), South Africa vs South Korea (Jun 24, Dallas)',
+    'czechia':      'Czechia vs South Korea (Jun 11, Los Angeles), Czechia vs South Africa (Jun 17, Los Angeles), Czechia vs Mexico (Jun 24, Mexico City)',
+    // Group B
+    'canada':       'Canada vs Bosnia (Jun 12, Toronto), Canada vs Qatar (Jun 18, Vancouver), Switzerland vs Canada (Jun 24, Vancouver)',
+    'bosnia':       'Bosnia vs Canada (Jun 12, Toronto), Bosnia vs Switzerland (Jun 18, Kansas City), Bosnia vs Qatar (Jun 24, Philadelphia)',
+    'qatar':        'Qatar vs Switzerland (Jun 12, San Francisco), Qatar vs Canada (Jun 18, Vancouver), Bosnia vs Qatar (Jun 24, Philadelphia)',
+    'switzerland':  'Switzerland vs Qatar (Jun 12, San Francisco), Switzerland vs Bosnia (Jun 18, Kansas City), Switzerland vs Canada (Jun 24, Vancouver)',
+    // Group C
+    'brazil':       'Brazil vs Morocco (Jun 13, MetLife NY), Brazil vs Haiti (Jun 19, Philadelphia), Scotland vs Brazil (Jun 24, Miami)',
+    'morocco':      'Brazil vs Morocco (Jun 13, MetLife NY), Morocco vs Scotland (Jun 19, Boston), Morocco vs Haiti (Jun 24, Atlanta)',
+    'haiti':        'Haiti vs Scotland (Jun 13, Atlanta), Haiti vs Brazil (Jun 19, Philadelphia), Morocco vs Haiti (Jun 24, Atlanta)',
+    'scotland':     'Scotland vs Haiti (Jun 13, Atlanta), Scotland vs Morocco (Jun 19, Boston), Scotland vs Brazil (Jun 24, Miami)',
+    // Group D
+    'usa':          'USA vs Paraguay (Jun 12, Los Angeles), USA vs Australia (Jun 19, Seattle), Türkiye vs USA (Jun 25, Los Angeles)',
+    'paraguay':     'Paraguay vs USA (Jun 12, Los Angeles), Paraguay vs Türkiye (Jun 19, Houston), Paraguay vs Australia (Jun 25, Miami)',
+    'australia':    'Australia vs Türkiye (Jun 12, Houston), Australia vs USA (Jun 19, Seattle), Paraguay vs Australia (Jun 25, Miami)',
+    'turkiye':      'Türkiye vs Australia (Jun 12, Houston), Türkiye vs Paraguay (Jun 19, Houston), Türkiye vs USA (Jun 25, Los Angeles)',
+    // Group E
+    'germany':      'Germany vs Curaçao (Jun 14, Houston), Germany vs Ivory Coast (Jun 20, Toronto), Ecuador vs Germany (Jun 25, MetLife NY)',
+    'curacao':      'Curaçao vs Germany (Jun 14, Houston), Curaçao vs Ecuador (Jun 20, Philadelphia), Ivory Coast vs Curaçao (Jun 25, Dallas)',
+    'ecuador':      'Ecuador vs Ivory Coast (Jun 14, Miami), Ecuador vs Curaçao (Jun 20, Philadelphia), Ecuador vs Germany (Jun 25, MetLife NY)',
+    'ivory-coast':  'Ivory Coast vs Ecuador (Jun 14, Miami), Ivory Coast vs Germany (Jun 20, Toronto), Ivory Coast vs Curaçao (Jun 25, Dallas)',
+    // Group F
+    'netherlands':  'Netherlands vs Japan (Jun 14, Dallas), Netherlands vs Sweden (Jun 20, Houston), Tunisia vs Netherlands (Jun 25, Kansas City)',
+    'japan':        'Japan vs Netherlands (Jun 14, Dallas), Japan vs Tunisia (Jun 20, Seattle), Sweden vs Japan (Jun 25, Boston)',
+    'sweden':       'Sweden vs Tunisia (Jun 14, Boston), Sweden vs Netherlands (Jun 20, Houston), Sweden vs Japan (Jun 25, Boston)',
+    'tunisia':      'Tunisia vs Sweden (Jun 14, Boston), Tunisia vs Japan (Jun 20, Seattle), Tunisia vs Netherlands (Jun 25, Kansas City)',
+    // Group G
+    'belgium':      'Belgium vs Egypt (Jun 15, Philadelphia), Belgium vs New Zealand (Jun 21, San Francisco), Iran vs Belgium (Jun 26, Kansas City)',
+    'egypt':        'Egypt vs Belgium (Jun 15, Philadelphia), Egypt vs Iran (Jun 21, Atlanta), New Zealand vs Egypt (Jun 26, Seattle)',
+    'iran':         'Iran vs New Zealand (Jun 15, San Francisco), Iran vs Egypt (Jun 21, Atlanta), Iran vs Belgium (Jun 26, Kansas City)',
+    'new-zealand':  'New Zealand vs Iran (Jun 15, San Francisco), New Zealand vs Belgium (Jun 21, San Francisco), New Zealand vs Egypt (Jun 26, Seattle)',
+    // Group H
+    'spain':        'Spain vs Cape Verde (Jun 15, Atlanta), Spain vs Saudi Arabia (Jun 21, Atlanta), Uruguay vs Spain (Jun 26, Guadalajara)',
+    'cape-verde':   'Cape Verde vs Spain (Jun 15, Atlanta), Cape Verde vs Uruguay (Jun 21, Miami), Saudi Arabia vs Cape Verde (Jun 26, Monterrey)',
+    'saudi-arabia': 'Saudi Arabia vs Uruguay (Jun 15, Monterrey), Saudi Arabia vs Spain (Jun 21, Atlanta), Saudi Arabia vs Cape Verde (Jun 26, Monterrey)',
+    'uruguay':      'Uruguay vs Saudi Arabia (Jun 15, Monterrey), Uruguay vs Cape Verde (Jun 21, Miami), Uruguay vs Spain (Jun 26, Guadalajara)',
+    // Group I
+    'france':       'France vs Senegal (Jun 16, MetLife NY), France vs Iraq (Jun 22, Philadelphia), Norway vs France (Jun 26, Boston)',
+    'senegal':      'Senegal vs France (Jun 16, MetLife NY), Senegal vs Norway (Jun 22, Atlanta), Senegal vs Iraq (Jun 26, Dallas)',
+    'norway':       'Norway vs Iraq (Jun 16, Seattle), Norway vs Senegal (Jun 22, Atlanta), Norway vs France (Jun 26, Boston)',
+    'iraq':         'Iraq vs Norway (Jun 16, Seattle), Iraq vs France (Jun 22, Philadelphia), Iraq vs Senegal (Jun 26, Dallas)',
+    // Group J
+    'argentina':    'Argentina vs Algeria (Jun 16, Kansas City), Argentina vs Austria (Jun 22, Dallas), Jordan vs Argentina (Jun 27, Dallas)',
+    'algeria':      'Algeria vs Argentina (Jun 16, Kansas City), Algeria vs Jordan (Jun 22, Miami), Austria vs Algeria (Jun 27, Houston)',
+    'austria':      'Austria vs Jordan (Jun 16, Miami), Austria vs Argentina (Jun 22, Dallas), Austria vs Algeria (Jun 27, Houston)',
+    'jordan':       'Jordan vs Austria (Jun 16, Miami), Jordan vs Algeria (Jun 22, Miami), Jordan vs Argentina (Jun 27, Dallas)',
+    // Group K
+    'portugal':     'Portugal vs DR Congo (Jun 17, Houston), Portugal vs Uzbekistan (Jun 23, Houston), Colombia vs Portugal (Jun 27, Miami)',
+    'dr-congo':     'DR Congo vs Portugal (Jun 17, Houston), DR Congo vs Colombia (Jun 23, MetLife NY), DR Congo vs Uzbekistan (Jun 27, Philadelphia)',
+    'uzbekistan':   'Uzbekistan vs Colombia (Jun 17, Seattle), Uzbekistan vs Portugal (Jun 23, Houston), Uzbekistan vs DR Congo (Jun 27, Philadelphia)',
+    'colombia':     'Colombia vs Uzbekistan (Jun 17, Seattle), Colombia vs DR Congo (Jun 23, MetLife NY), Colombia vs Portugal (Jun 27, Miami)',
+    // Group L
+    'england':      'England vs Croatia (Jun 17, Dallas), England vs Ghana (Jun 23, Boston), Panama vs England (Jun 27, MetLife NY)',
+    'croatia':      'Croatia vs England (Jun 17, Dallas), Croatia vs Panama (Jun 23, Kansas City), Croatia vs Ghana (Jun 27, Toronto)',
+    'ghana':        'Ghana vs Panama (Jun 17, Toronto), Ghana vs England (Jun 23, Boston), Ghana vs Croatia (Jun 27, Toronto)',
+    'panama':       'Panama vs Ghana (Jun 17, Toronto), Panama vs Croatia (Jun 23, Kansas City), Panama vs England (Jun 27, MetLife NY)',
   }
 
   const budgetLabel = budget === 'budget' ? 'budget ($60-100/night)' : budget === 'premium' ? 'premium ($250-400/night)' : 'mid-range ($130-200/night)'
