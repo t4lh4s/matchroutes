@@ -223,6 +223,15 @@
   .divider { position:relative; z-index:1; height:1px; background:var(--border); }
   .hidden { display:none !important; }
 
+  /* AUTOCOMPLETE */
+  .ac-wrap { position:relative; }
+  .ac-list { display:none; position:absolute; top:calc(100% + 4px); left:0; right:0; background:var(--dark-3); border:1px solid var(--border-bright); border-radius:8px; z-index:200; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.5); }
+  .ac-item { display:flex; align-items:center; gap:8px; padding:8px 12px; cursor:pointer; font-size:13px; transition:background 0.1s; }
+  .ac-item:hover, .ac-item.hi { background:rgba(106,179,42,0.15); }
+  .ac-item .ci { font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:14px; color:var(--green-light); min-width:36px; }
+  .ac-item .cm { color:var(--text); flex:1; }
+  .ac-item .cs { color:var(--text-dim); font-size:11px; }
+
   @media(max-width:600px) {
     .stats-bar { flex-wrap:wrap; }
     .stat-item { border-right:none; border-bottom:1px solid var(--border); flex:1 1 40%; }
@@ -362,7 +371,7 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label">Flying from</label>
-            <input id="homeCity" class="form-input" type="text" placeholder="e.g. London, São Paulo, Tokyo">
+            <div class="ac-wrap"><input id="homeCity" class="form-input" type="text" placeholder="e.g. London, São Paulo, Tokyo" autocomplete="off" oninput="acCity(this)" onkeydown="acNav(event,'hcl')"><div id="hcl" class="ac-list"></div></div>
           </div>
           <div class="form-group">
             <label class="form-label">Home airport</label>
