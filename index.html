@@ -366,7 +366,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Home airport</label>
-            <input id="homeAirport" class="form-input" type="text" placeholder="e.g. LHR, GRU, NRT" style="text-transform:uppercase">
+            <div class="ac-wrap"><input id="homeAirport" class="form-input" type="text" placeholder="e.g. LHR, London, Tokyo" autocomplete="off" style="text-transform:uppercase" oninput="acAirport(this)" onkeydown="acNav(event,'hal')"><div id="hal" class="ac-list"></div></div>
           </div>
         </div>
         <div class="form-row">
@@ -662,6 +662,65 @@ function renderItinerary(itin) {
   document.getElementById('itinContent').innerHTML = html
 }
 
+
+const AIRPORTS=[{i:'LHR',c:'London Heathrow',n:'UK'},{i:'LGW',c:'London Gatwick',n:'UK'},{i:'STN',c:'London Stansted',n:'UK'},{i:'JFK',c:'New York JFK',n:'USA'},{i:'EWR',c:'Newark',n:'USA'},{i:'LAX',c:'Los Angeles',n:'USA'},{i:'ORD',c:'Chicago',n:'USA'},{i:'ATL',c:'Atlanta',n:'USA'},{i:'DFW',c:'Dallas',n:'USA'},{i:'MIA',c:'Miami',n:'USA'},{i:'SFO',c:'San Francisco',n:'USA'},{i:'BOS',c:'Boston',n:'USA'},{i:'SEA',c:'Seattle',n:'USA'},{i:'IAH',c:'Houston Bush',n:'USA'},{i:'PHL',c:'Philadelphia',n:'USA'},{i:'MCI',c:'Kansas City',n:'USA'},{i:'YYZ',c:'Toronto',n:'Canada'},{i:'YVR',c:'Vancouver',n:'Canada'},{i:'MEX',c:'Mexico City',n:'Mexico'},{i:'GDL',c:'Guadalajara',n:'Mexico'},{i:'MTY',c:'Monterrey',n:'Mexico'},{i:'GRU',c:'Sao Paulo',n:'Brazil'},{i:'GIG',c:'Rio de Janeiro',n:'Brazil'},{i:'EZE',c:'Buenos Aires',n:'Argentina'},{i:'BOG',c:'Bogota',n:'Colombia'},{i:'SCL',c:'Santiago',n:'Chile'},{i:'CDG',c:'Paris CDG',n:'France'},{i:'AMS',c:'Amsterdam',n:'Netherlands'},{i:'FRA',c:'Frankfurt',n:'Germany'},{i:'MUC',c:'Munich',n:'Germany'},{i:'BER',c:'Berlin',n:'Germany'},{i:'MAD',c:'Madrid',n:'Spain'},{i:'BCN',c:'Barcelona',n:'Spain'},{i:'FCO',c:'Rome',n:'Italy'},{i:'ZRH',c:'Zurich',n:'Switzerland'},{i:'LIS',c:'Lisbon',n:'Portugal'},{i:'DUB',c:'Dublin',n:'Ireland'},{i:'CPH',c:'Copenhagen',n:'Denmark'},{i:'OSL',c:'Oslo',n:'Norway'},{i:'ARN',c:'Stockholm',n:'Sweden'},{i:'IST',c:'Istanbul',n:'Turkey'},{i:'DXB',c:'Dubai',n:'UAE'},{i:'DOH',c:'Doha',n:'Qatar'},{i:'CAI',c:'Cairo',n:'Egypt'},{i:'CMN',c:'Casablanca',n:'Morocco'},{i:'JNB',c:'Johannesburg',n:'South Africa'},{i:'CPT',c:'Cape Town',n:'South Africa'},{i:'NBO',c:'Nairobi',n:'Kenya'},{i:'ACC',c:'Accra',n:'Ghana'},{i:'NRT',c:'Tokyo Narita',n:'Japan'},{i:'HND',c:'Tokyo Haneda',n:'Japan'},{i:'ICN',c:'Seoul',n:'South Korea'},{i:'PVG',c:'Shanghai',n:'China'},{i:'HKG',c:'Hong Kong',n:'HK'},{i:'SIN',c:'Singapore',n:'Singapore'},{i:'BKK',c:'Bangkok',n:'Thailand'},{i:'DEL',c:'New Delhi',n:'India'},{i:'BOM',c:'Mumbai',n:'India'},{i:'SYD',c:'Sydney',n:'Australia'},{i:'MEL',c:'Melbourne',n:'Australia'},{i:'AKL',c:'Auckland',n:'NZ'}]
+
+let acTimer
+async function acCity(inp){
+  clearTimeout(acTimer)
+  const v=inp.value.trim(), l=document.getElementById('hcl')
+  if(v.length<2){l.style.display='none';return}
+  acTimer=setTimeout(async()=>{
+    try{
+      const r=await fetch('https://api.teleport.org/api/cities/?search='+encodeURIComponent(v)+'&limit=6')
+      const d=await r.json()
+      const items=d._embedded?.['city:search-results']||[]
+      if(!items.length){l.style.display='none';return}
+      l.innerHTML=items.map(it=>{
+        const n=it.matching_full_name||''
+        const parts=n.split(',')
+        const city=parts[0]?.trim()||n
+        const rest=parts.slice(1).join(',').trim()
+        return '<div class="ac-item" onmousedown="pickCity(event,\''+city+'\')"><span class="cm">'+city+'</span><span class="cs">'+rest+'</span></div>'
+      }).join('')
+      l.style.display='block'
+    }catch(e){l.style.display='none'}
+  },300)
+}
+
+function acAirport(inp){
+  const v=inp.value.toUpperCase(), l=document.getElementById('hal')
+  if(v.length<2){l.style.display='none';return}
+  const m=AIRPORTS.filter(a=>a.i.includes(v)||a.c.toUpperCase().includes(v)||a.n.toUpperCase().includes(v)).slice(0,7)
+  if(!m.length){l.style.display='none';return}
+  l.innerHTML=m.map(a=>'<div class="ac-item" onmousedown="pickAirport(event,\''+a.i+'\')"><span class="ci">'+a.i+'</span><span class="cm">'+a.c+'</span><span class="cs">'+a.n+'</span></div>').join('')
+  l.style.display='block'
+}
+
+function pickCity(e,val){
+  e.preventDefault()
+  document.getElementById('homeCity').value=val
+  document.getElementById('hcl').style.display='none'
+  updateGenerateBtn&&updateGenerateBtn()
+}
+
+function pickAirport(e,iata){
+  e.preventDefault()
+  document.getElementById('homeAirport').value=iata
+  document.getElementById('hal').style.display='none'
+}
+
+function acNav(e,lid){
+  const l=document.getElementById(lid)
+  const items=[...l.querySelectorAll('.ac-item')]
+  const cur=l.querySelector('.hi')
+  if(e.key==='ArrowDown'){e.preventDefault();if(cur){cur.classList.remove('hi');(cur.nextElementSibling||items[0])?.classList.add('hi')}else items[0]?.classList.add('hi')}
+  else if(e.key==='ArrowUp'){e.preventDefault();if(cur){cur.classList.remove('hi');(cur.previousElementSibling||items[items.length-1])?.classList.add('hi')}else items[items.length-1]?.classList.add('hi')}
+  else if(e.key==='Enter'&&cur){e.preventDefault();cur.dispatchEvent(new MouseEvent('mousedown'))}
+  else if(e.key==='Escape')l.style.display='none'
+}
+
+document.addEventListener('click',e=>{if(!e.target.closest('.ac-wrap'))document.querySelectorAll('.ac-list').forEach(l=>l.style.display='none')})
 // Init
 buildGroupFilter()
 renderTeams()
