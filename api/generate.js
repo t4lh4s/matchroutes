@@ -97,7 +97,7 @@ module.exports = async (req, res) => {
     return {
       ...city,
       neighborhood: cd.hood || city.whereToStay,
-      bookingUrl: 'https://www.booking.com/searchresults.html?' + p,
+        bookingUrl: 'https://www.awin1.com/cread.php?awinmid=6776&awinaffid=2878051&ued=' + encodeURIComponent('https://www.booking.com/searchresults.html?' + p),
       flightsUrl: 'https://www.google.com/travel/flights?q=Flights+from+' + from + '+to+' + (cd.airport || 'NYC') + '+on+' + city.arrivalDate,
       stubhubUrl: 'https://www.stubhub.com/fifa-world-cup-2026-tickets/performer/150439/?q=' + encodeURIComponent(teamName),
       gygUrl: 'https://www.getyourguide.com/' + city.cityName.toLowerCase().replace(/[\s\/]+/g,'-').replace(/[^a-z0-9-]/g,'') + '-l/',
